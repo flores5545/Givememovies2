@@ -5,7 +5,7 @@ main().catch(err => console.log(err));
 
 async function main() {
   await mongoose.connect(`${KEY}`);
-  console.log("connected to db");
+  console.log('connected to db');
 }
 
 

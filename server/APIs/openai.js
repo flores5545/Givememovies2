@@ -1,32 +1,34 @@
 // Get prompt, extract keywords (Actor/director, max runtime, genre...) and return array with these keywords
 // [Lenght(in minutes), Actor, Director, Genre]
 
-API_KEY = process.env.OPENAI_API_KEY
+const API_KEY = process.env.OPENAI_API_KEY
 async function fetchAI(input) {
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
     headers: {
       Authorization: `Bearer ${API_KEY}`,
-      "Content-Type": "application/json"
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
+      model: 'gpt-3.5-turbo',
       messages: [
         {
-          "role": "system",
-          "content": "given an input like: I want to watch a Tom Cruise action movie which is less than 2 hours long, extract the information in the following format: [Lenght(in minutes), Actor, Director, Genre] Make sure the first letter is uppercase. If something is not specified, add it to the list as null. The list should only contain the categories specified in the example provided between [ symbols. Do not add more than one value per category"
+          'role': 'system',
+          'content': 'given an input like: I want to watch a Tom Cruise action movie which is less than 2 hours long, extract the information in the following format: [Lenght in minutes, Actor, Director, Genre] Make sure the first letter is always uppercase. If something is not specified, add it to the list as null. The list should only contain the categories specified in the example provided between [ symbols. Do not add more than one value per category'
         },
-        { "role": "user", "content": "I want to watch a scifi movie with tom cruise which is more than 2 hours" }
+        { 'role': 'user', 'content': `${input}` }
       ],
       max_tokens: 20
     })
   })
   let data = await res.json();
-  data =  data.choices[0].message.content.replace(/[\[\]]/g, "").split(", ")
-  console.log(data);
+  if (data.choices == undefined) {
+    return 'Please re-enter your prompt.'
+  }
+  data = data.choices[0].message.content.replace(/[\[\]]/g, '').split(', ');
   return data;
 }
-fetchAI()
+
 module.exports = fetchAI;
 
 

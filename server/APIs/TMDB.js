@@ -1,58 +1,63 @@
 const KEY = process.env.TMDB_API_KEY;
-//const fetchAI = require('./openai');
-
+const fetchAI = require('./openai');
 
 const options = {
   method: 'GET',
   headers: {
     accept: 'application/json',
-    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiOGE2OGI0MzllZDBiMTJlODJhY2RjZmVmNzY0ZGZlOSIsInN1YiI6IjY0YzI0N2ZjMmYxYmUwMDBlYmQ1ZTgwNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.xxyU3SPS7zdi3do2I_QT8JWFmBvF-osud4uEq0V0gS4'
+    Authorization: `Bearer ${KEY}`
   }
 };
 
 // Find the movies that satisfy the given max runtime and ids for genre, actors and directors.
-async function movieFinder(input) {
+async function movieFinder(prompt) {
   // First we get the array of the keywords extracted by the AI
-  //let data = fetchAI(input);
+  let data = await fetchAI(prompt);
 
-  let baseURL = 'https://api.themoviedb.org/3/discover/movie';
-  const mockArr = ['120', 'Tom Hanks', 'Steven Spielberg', 'Action'];
-
-  const genreID = await genreIDFinder(mockArr[3]);
-  const actorID = await personIDFinder(mockArr[1]);
-  const directorID = await personIDFinder(mockArr[2]);
-
-  let runtime
-  if (mockArr[0] === 'null') {
-    runtime = '';
-  } else {
-    runtime = mockArr[0];
+  if (!data.some((el) => el !== 'null') || data.length < 3 || typeof data === 'string') {
+    return { key: 'Could not find any movies that match your request. Try changing your prompt.' }
   }
 
-  console.log(genreID);
-  console.log(actorID);
-  console.log(directorID);
-  console.log(runtime);
+  let baseURL = 'https://api.themoviedb.org/3/discover/movie';
 
-  const movies = await fetch(baseURL + '?' + 'with_runtime.lte=' + `${runtime}&` + 'with_genres=' + `${genreID}&` + 'with_people=' + `${actorID},` + `${directorID}`, options)
+  const genreID = await genreIDFinder(data[3]);
+  const actorID = await personIDFinder(data[1]);
+  const directorID = await personIDFinder(data[2]);
+  let runtime;
+
+  if (data[0] === 'null') {
+    runtime = '';
+  } else {
+    runtime = data[0];
+  }
+
+  const movies = await fetch(`${baseURL}?with_runtime.lte=${runtime}&with_genres=${genreID}&with_people=${actorID},${directorID}`, options)
     .then((movie) => movie.json())
     .catch(err => console.log(err));
-  console.log(movies);
+  return movies.results;
 }
-movieFinder()
 
+
+// Find the movie by ID to display its details
+async function movieFinderByID(ID) {
+  let baseURL = 'https://api.themoviedb.org/3/movie/'
+
+  const movie = await fetch(baseURL + `${ID}`, options)
+    .then((movie) => movie.json())
+    .catch(err => console.log(err));
+  return movie;
+}
 
 // HELPER FUNCTIONS
 // Find the id of the given genre
 async function genreIDFinder(genreName) {
   if (genreName !== 'null') {
     let genreID;
-    if (genreName === 'Romcom' || genreName === 'Rom-com') {
+    if (genreName.toLowerCase() === 'romcom' || genreName.toLowerCase() === 'rom-com') {
       genreID = '10749,35';
-    } else if (genreName === 'Sci-fi' || genreName === 'Scifi') {
+    } else if (genreName === 'sci-fi' || genreName === 'scifi') {
       genreID = '878';
     } else {
-
       // Get list of genres
       const genreList = await fetch('https://api.themoviedb.org/3/genre/movie/list', options)
         .then((genre) => genre.json())
@@ -81,3 +86,7 @@ async function personIDFinder(personName) {
   }
   return;
 }
+
+
+
+module.exports = { movieFinder, movieFinderByID };

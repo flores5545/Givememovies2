@@ -2,10 +2,12 @@ const Router = require('koa-router');
 const router = new Router();
 const controller = require('./controllers/index');
 
-// Should be able to filter by year, genre, max screen time... (INITIALLY)
-router.get('/movies', controller.getMovies);
 
+router.get('/', controller.getMovies);
+router.post('/', controller.getMovies);
 
+router.get('/id', controller.getMoviesByID);
+router.post('/id', controller.getMoviesByID);
 
 
 module.exports = router;
