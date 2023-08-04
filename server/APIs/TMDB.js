@@ -9,82 +9,63 @@ const options = {
   }
 };
 
-// Find the movies that satisfy the given max runtime and ids for genre, actors and directors.
+const base_url = `https://api.themoviedb.org/3`
+
 async function movieFinder(prompt) {
-  // First we get the array of the keywords extracted by the AI
-  let data = await fetchAI(prompt);
+  const data = await fetchAI(prompt);
 
   if (!data.some((el) => el !== 'null') || data.length < 3 || typeof data === 'string') {
     return { key: 'Could not find any movies that match your request. Try changing your prompt.' }
   }
 
-  let baseURL = 'https://api.themoviedb.org/3/discover/movie';
+  const inner_base_url = `${base_url}/discover/movie`;
+  try {
+    const actorID = await personIDFinder(data[1]);
+    const directorID = await personIDFinder(data[2]);
+    const genreID = await genreIDFinder(data[3]);
+    const runtime = data[0] === 'null' ? '' : data[0];
 
-  const genreID = await genreIDFinder(data[3]);
-  const actorID = await personIDFinder(data[1]);
-  const directorID = await personIDFinder(data[2]);
-  let runtime;
-
-  if (data[0] === 'null') {
-    runtime = '';
-  } else {
-    runtime = data[0];
+    const response = await fetch(`${inner_base_url}?with_runtime.lte=${runtime}&with_genres=${genreID}&with_people=${actorID},${directorID}`, options);
+    const movies = await response.json();
+    return movies.results;  
+  } catch (error) {
+    return error;
   }
 
-  const movies = await fetch(`${baseURL}?with_runtime.lte=${runtime}&with_genres=${genreID}&with_people=${actorID},${directorID}`, options)
-    .then((movie) => movie.json())
-    .catch(err => console.log(err));
-  return movies.results;
 }
 
-
-// Find the movie by ID to display its details
 async function movieFinderByID(ID) {
-  let baseURL = 'https://api.themoviedb.org/3/movie/'
-
-  const movie = await fetch(baseURL + `${ID}`, options)
+  const baseURL = `${base_url}/movie/`;
+  return fetch(`${baseURL}${ID}`, options)
     .then((movie) => movie.json())
-    .catch(err => console.log(err));
-  return movie;
+    .then(movie => movie)
+    .catch(err => err);
 }
 
-// HELPER FUNCTIONS
-// Find the id of the given genre
 async function genreIDFinder(genreName) {
-  if (genreName !== 'null') {
-    let genreID;
-    if (genreName.toLowerCase() === 'romcom' || genreName.toLowerCase() === 'rom-com') {
-      genreID = '10749,35';
-    } else if (genreName === 'sci-fi' || genreName === 'scifi') {
-      genreID = '878';
-    } else {
-      // Get list of genres
-      const genreList = await fetch('https://api.themoviedb.org/3/genre/movie/list', options)
-        .then((genre) => genre.json())
-        .catch(err => console.log(err));
+  if (genreName === 'null') return '';
+  if (genreName.toLowerCase() === 'romcom' || genreName.toLowerCase() === 'rom-com') return '10749,35';
+  if (genreName === 'sci-fi' || genreName === 'scifi') return '878';
 
-      // Find the genre with the same name as the given genre and extract its id
-      for (let genre of genreList.genres) {
-        if (genre.name === genreName) {
-          genreID = genre.id;
-        }
-      }
+  try {
+    const genreResult = await etch(`${base_url}/genre/movie/list`, options);
+    for (let genre of genreResult.genres) {
+      if (genre.name === genreName) return genre.id;
     }
-    return genreID;
+  } catch (error) {
+   return error; 
   }
-  return '';
 }
 
-// Find the id of the given Actor/Director
 async function personIDFinder(personName) {
-  if (personName !== 'null') {
-    const people = await fetch(`https://api.themoviedb.org/3/search/person?query=${personName}`, options)
-      .then((person) => person.json())
-      .catch(err => console.log(err));
-    const personId = people.results[0].id;
-    return personId;
+  if (personName === 'null') return;
+  try {
+    const response = await fetch(`${base_url}/search/person?query=${personName}`, options);
+    const people = await response.json();
+    return people.results[0].id;
+  } catch (error) {
+    return err;
   }
-  return;
 }
 
 
