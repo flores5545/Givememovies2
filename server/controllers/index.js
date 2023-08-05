@@ -1,15 +1,14 @@
-const {movieFinderByID} = require('../APIs/TMDB');
-const {movieFinder} = require('../APIs/TMDB');
+const {movieFinderByID, movieFinder} = require('../APIs/TMDB');
 
-//const prompt = "I want to watch a scifi movie with tom cruise which is less than 2 hours";
+const default_prompt = "I want to watch a scifi movie with tom cruise which is less than 2 hours";
 
 async function getMovies(ctx) {
   try {
-    ctx.body = await movieFinder(ctx.request.body.prompt);
+    ctx.body = await movieFinder(ctx.request.body.prompt || default_prompt);
     ctx.status = 200;
   } catch (err) {
     ctx.status = 500;
-    console.log(err);
+    ctx.body = err;
   }
 }
 
@@ -22,7 +21,7 @@ async function getMoviesByID(ctx) {
     ctx.status = 200;
   } catch (err) {
     ctx.status = 500;
-    console.log(err)
+    ctx.body = err;
   }
 }
 

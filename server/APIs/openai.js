@@ -1,7 +1,6 @@
-// Get prompt, extract keywords (Actor/director, max runtime, genre...) and return array with these keywords
-// [Lenght(in minutes), Actor, Director, Genre]
+require('dotenv').config();
+const API_KEY = process.env.OPENAI_API_KEY;
 
-const API_KEY = process.env.OPENAI_API_KEY
 async function fetchAI(input) {
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -25,8 +24,7 @@ async function fetchAI(input) {
   if (data.choices == undefined) {
     return 'Please re-enter your prompt.'
   }
-  data = data.choices[0].message.content.replace(/[\[\]]/g, '').split(', ');
-  return data;
+  return data.choices[0].message.content.replace(/[\[\]]/g, '').split(', ');
 }
 
 module.exports = fetchAI;

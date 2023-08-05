@@ -1,3 +1,4 @@
+require('dotenv').config();
 const KEY = process.env.TMDB_API_KEY;
 const fetchAI = require('./openai');
 
@@ -38,7 +39,6 @@ async function movieFinderByID(ID) {
   const baseURL = `${base_url}/movie/`;
   return fetch(`${baseURL}${ID}`, options)
     .then((movie) => movie.json())
-    .then(movie => movie)
     .catch(err => err);
 }
 
