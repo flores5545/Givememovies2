@@ -1,12 +1,13 @@
-const Koa = require('koa');
-const router = require('./router');
-const bodyParser = require('koa-bodyparser');
-const cors = require('@koa/cors');
+const app = require('./app/app');
 
-const app = new Koa();
+const start = (port) => {
+  try {
+    app.listen(port, () => {
+      console.log(`Server is listening on port: ${port}`);
+    });
+  } catch (error) {
+    console.error(`Failed to start server ${error}`);
+  }
+}
 
-app.use(cors());
-app.use(bodyParser());
-app.use(router.routes());
-
-app.listen(3001, () => console.log('Server is listening on port 3001'));
+start(3001);

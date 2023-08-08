@@ -14,7 +14,6 @@ const base_url = `https://api.themoviedb.org/3`
 
 async function movieFinder(prompt) {
   const data = await fetchAI(prompt);
-
   if (!data.some((el) => el !== 'null') || data.length < 3 || typeof data === 'string') {
     return { key: 'Could not find any movies that match your request. Try changing your prompt.' }
   }

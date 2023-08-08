@@ -1,10 +1,8 @@
 const {movieFinderByID, movieFinder} = require('../APIs/TMDB');
 
-const default_prompt = "I want to watch a scifi movie with tom cruise which is less than 2 hours";
-
 async function getMovies(ctx) {
   try {
-    ctx.body = await movieFinder(ctx.request.body.prompt || default_prompt);
+    ctx.body = await movieFinder(ctx.request.body.prompt);
     ctx.status = 200;
   } catch (err) {
     ctx.status = 500;
