@@ -9,4 +9,4 @@ app.use(cors());
 app.use(bodyParser());
 app.use(router.routes());
 
-app.listen(3001, () => console.log('Server is listening on port 3001'));
+module.exports = app;

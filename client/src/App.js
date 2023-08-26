@@ -1,17 +1,17 @@
 import './App.css';
 import React, { useState } from 'react';
 
-function App() {
+function App () {
   const [movies, setMovies] = useState([]);
   const [prompt, setPrompt] = useState('');
   const [movie, setMovie] = useState({});
   const [show, setShow] = useState(false);
 
-  async function handlePromptChange(event) {
+  async function handlePromptChange (event) {
     setPrompt(event.target.value);
   }
 
-  async function handleEnter(event){
+  async function handleEnter (event){
     if (event.key === 'Enter') {
       await getMovies(prompt);
       setShow(true);

@@ -10,15 +10,15 @@ const options = {
 };
 
 // Find the movies that satisfy the given max runtime and ids for genre, actors and directors.
-async function movieFinder(prompt) {
+async function movieFinder (prompt) {
   // First we get the array of the keywords extracted by the AI
-  let data = await fetchAI(prompt);
+  const data = await fetchAI(prompt);
 
   if (!data.some((el) => el !== 'null') || data.length < 3 || typeof data === 'string') {
-    return { key: 'Could not find any movies that match your request. Try changing your prompt.' }
+    return { key: 'Could not find any movies that match your request. Try changing your prompt.' };
   }
 
-  let baseURL = 'https://api.themoviedb.org/3/discover/movie';
+  const baseURL = 'https://api.themoviedb.org/3/discover/movie';
 
   const genreID = await genreIDFinder(data[3]);
   const actorID = await personIDFinder(data[1]);
@@ -37,10 +37,9 @@ async function movieFinder(prompt) {
   return movies.results;
 }
 
-
 // Find the movie by ID to display its details
-async function movieFinderByID(ID) {
-  let baseURL = 'https://api.themoviedb.org/3/movie/'
+async function movieFinderByID (ID) {
+  const baseURL = 'https://api.themoviedb.org/3/movie/';
 
   const movie = await fetch(baseURL + `${ID}`, options)
     .then((movie) => movie.json())
@@ -50,7 +49,7 @@ async function movieFinderByID(ID) {
 
 // HELPER FUNCTIONS
 // Find the id of the given genre
-async function genreIDFinder(genreName) {
+async function genreIDFinder (genreName) {
   if (genreName !== 'null') {
     let genreID;
     if (genreName.toLowerCase() === 'romcom' || genreName.toLowerCase() === 'rom-com') {
@@ -64,7 +63,7 @@ async function genreIDFinder(genreName) {
         .catch(err => console.log(err));
 
       // Find the genre with the same name as the given genre and extract its id
-      for (let genre of genreList.genres) {
+      for (const genre of genreList.genres) {
         if (genre.name === genreName) {
           genreID = genre.id;
         }
@@ -76,7 +75,7 @@ async function genreIDFinder(genreName) {
 }
 
 // Find the id of the given Actor/Director
-async function personIDFinder(personName) {
+async function personIDFinder (personName) {
   if (personName !== 'null') {
     const people = await fetch(`https://api.themoviedb.org/3/search/person?query=${personName}`, options)
       .then((person) => person.json())
@@ -84,9 +83,6 @@ async function personIDFinder(personName) {
     const personId = people.results[0].id;
     return personId;
   }
-  return;
 }
-
-
 
 module.exports = { movieFinder, movieFinderByID };
