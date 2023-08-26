@@ -2,6 +2,15 @@
 
 **Givememovies** is a website that uses AI, more specifically Natural Language Processing, to suggest movies to users using prompts, according to 4 different criteria: Genre, Actor, Director, and Maximum watchtime. 
 
+<figure>
+    <img alt="bar chart" width="1000vw" src="screenshots/Captura de pantalla 2023-08-26 100609.png"/>
+</figure>
+<figure>
+    <img alt="bar chart" width="1000vw" src="screenshots/Captura de pantalla 2023-08-26 100912.png"/>
+</figure>
+<figure>
+    <img alt="bar chart" width="1000vw" src="screenshots/Captura de pantalla 2023-08-26 101011.png"/>
+</figure>
 
 ## Getting started
 
